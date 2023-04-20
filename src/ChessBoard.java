@@ -21,7 +21,7 @@ public class ChessBoard extends JFrame {
     private ArrayList<Piece> white_pieces, black_pieces, all_pieces;
     public boolean white_in_check, black_in_check, white_in_mate, black_in_mate, stalemate;
 
-    private final int search_depth = 2;
+    private final int search_depth = 1;
 
     public ChessBoard(Piece[][] mat) {
         setTitle("Chess Board");
@@ -129,13 +129,13 @@ public class ChessBoard extends JFrame {
 
     public void updateBoard() {
 
-        if (turn == PieceColor.BLACK) {
+        /*if (turn == PieceColor.BLACK) {
             System.out.println("minimax : " + (minimax(search_depth, false)));
             turn = PieceColor.WHITE;
-            System.out.print("black pieces after the function: ");
+            System.out.print("black pieces after function : ");
             Utils.printPieces(black_pieces);
+        }*/
 
-        }
 
 
         panel.repaint();
@@ -427,11 +427,12 @@ public class ChessBoard extends JFrame {
                         }
                     }
                 }
-
+                System.out.print("black pieces after all moves of : " + piece);
+                System.out.println();
+                Utils.printPieces(black_pieces);
             }
 
-            System.out.print("black pieces after for loop: ");
-            Utils.printPieces(black_pieces);
+
 
 
             if (depth == search_depth) {
@@ -441,8 +442,6 @@ public class ChessBoard extends JFrame {
 
             }
 
-            System.out.print("black pieces after best move: ");
-            Utils.printPieces(black_pieces);
 
             return minEval;
         }

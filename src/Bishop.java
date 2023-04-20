@@ -9,7 +9,7 @@ public class Bishop extends Piece {
 
 
 
-    public ArrayList<int[]> getLegalMoves(Piece[][] matrix) {
+    public ArrayList<int[]> getPseudoMoves(Piece[][] matrix) {
 
         int row = this.pos[0];
         int col = this.pos[1];
@@ -18,13 +18,14 @@ public class Bishop extends Piece {
         int[] bottomRight = {row + 1, col + 1};
         int[] bottomLeft = {row + 1, col - 1};
 
-        legalMoves.clear();
-        this.goToDir(matrix, topRight);
-        this.goToDir(matrix, topLeft);
-        this.goToDir(matrix, bottomRight);
-        this.goToDir(matrix, bottomLeft);
 
-        return legalMoves;
+        ArrayList<int[]> moves = new ArrayList<>();
+        this.goToDir(matrix, topRight, moves);
+        this.goToDir(matrix, topLeft, moves);
+        this.goToDir(matrix, bottomRight, moves);
+        this.goToDir(matrix, bottomLeft, moves);
+
+        return moves;
     }
 
 

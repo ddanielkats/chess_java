@@ -117,7 +117,7 @@ public class Utils {
     }
 
 
-    public static Piece[][] copyMat(Piece[][] arr){
+    /*public static Piece[][] copyMat(Piece[][] arr){
         Piece[][] newArray = new Piece[8][8];
 
         for (int i = 0; i < 8; i++){
@@ -135,6 +135,6 @@ public class Utils {
         return  newArray;
 
 
-    }
+    }*/
 
 }

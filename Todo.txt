@@ -2,10 +2,9 @@ fix mate and check to feature stalemate, also fix the white_in_mate boolean beca
 maybe use return from mate in movePiece and not update the bool in mate)
 
 simulate moves is inefficient because it calculates all legal moves 2 times
-
+when calculating legal moves, remember all moves that contain a king, and the calculate check will be more efficient
 minimax:
-    in lines 406 and 408 print different matrixes for some reason
-
+    black pieces after function with more then 1 king is buggy
 
 
 change calculate check to scan to all directions from king, and the checking the pieces that collide with the scan

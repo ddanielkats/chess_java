@@ -6,7 +6,7 @@ public class Pawn extends Piece {
         super("pawn", color, 1);
     }
 
-    public ArrayList<int[]> getLegalMoves(Piece[][] matrix) {
+    public ArrayList<int[]> getPseudoMoves(Piece[][] matrix) {
         ArrayList<int[]> localMoves = new ArrayList<>();
 
         int row = this.pos[0];
@@ -19,7 +19,7 @@ public class Pawn extends Piece {
         int [] top_left = new int[]{row + up_direction, col - 1};
 
 
-        legalMoves.clear();
+
         //move up one squares
         if (Utils.withinMatrix(up_one) && Utils.matrixIn(matrix, up_one) == null) {
             localMoves.add(up_one);
@@ -29,18 +29,14 @@ public class Pawn extends Piece {
         }
 
         //eat diagonally
-        if (Utils.withinMatrix(top_right) &&
-                Utils.matrixIn(matrix, top_right) != null  &&
-                !Utils.matrixIn(matrix, top_right).color.equals(color))
+        if (Utils.withinMatrix(top_right) && Utils.matrixIn(matrix, top_right) != null)
             localMoves.add(top_right);
 
-        if (Utils.withinMatrix(top_left) &&
-                Utils.matrixIn(matrix, top_left) != null  &&
-                !Utils.matrixIn(matrix, top_left).color.equals(color))
+        if (Utils.withinMatrix(top_left) && Utils.matrixIn(matrix, top_left) != null)
             localMoves.add(top_left);
 
 
-        this.legalMoves = localMoves;
-        return  this.legalMoves;
+
+        return  localMoves;
     }
 }

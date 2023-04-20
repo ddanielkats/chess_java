@@ -9,7 +9,7 @@ public class Queen extends Piece {
 
 
 
-    public ArrayList<int[]> getLegalMoves(Piece[][] matrix) {
+    public ArrayList<int[]> getPseudoMoves(Piece[][] matrix) {
 
         int row = this.pos[0];
         int col = this.pos[1];
@@ -23,17 +23,18 @@ public class Queen extends Piece {
         int[] bottomLeft = {row + 1, col - 1};
 
 
-        legalMoves.clear();
-        this.goToDir(matrix, right);
-        this.goToDir(matrix, down);
-        this.goToDir(matrix, left);
-        this.goToDir(matrix, up);
-        this.goToDir(matrix, topRight);
-        this.goToDir(matrix, topLeft);
-        this.goToDir(matrix, bottomRight);
-        this.goToDir(matrix, bottomLeft);
 
-        return legalMoves;
+        ArrayList<int[]> moves = new ArrayList<>();
+        this.goToDir(matrix, right, moves);
+        this.goToDir(matrix, down, moves);
+        this.goToDir(matrix, left, moves);
+        this.goToDir(matrix, up, moves);
+        this.goToDir(matrix, topRight, moves);
+        this.goToDir(matrix, topLeft, moves);
+        this.goToDir(matrix, bottomRight, moves);
+        this.goToDir(matrix, bottomLeft, moves);
+
+        return moves;
     }
 
 
