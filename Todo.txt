@@ -1,0 +1,13 @@
+fix mate and check to feature stalemate, also fix the white_in_mate boolean because it's not currect for stalemate (
+maybe use return from mate in movePiece and not update the bool in mate)
+
+simulate moves is inefficient because it calculates all legal moves 2 times
+
+minimax:
+    in lines 406 and 408 print different matrixes for some reason
+
+
+
+change calculate check to scan to all directions from king, and the checking the pieces that collide with the scan
+add pawn promotion
+add castling
