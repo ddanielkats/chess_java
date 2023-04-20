@@ -72,18 +72,9 @@ public abstract class Piece {
     public void getLegalMoves(Piece[][] matrix){
         ArrayList<int[]> pseudo_moves = getPseudoMoves(matrix);
         Piece value;
-        ArrayList<int[]> moves = new ArrayList<>();
 
         legalMoves.clear();
-        for (int [] move : pseudo_moves){
-            if (Utils.withinMatrix(move)){
-                value = matrix[move[0]][move[1]];
-                if (value != null && value.color.equals(color))
-                    continue;
-                moves.add(move);
-            }
-        }
-        legalMoves = moves;
+        legalMoves = pseudo_moves;
 
     }
 

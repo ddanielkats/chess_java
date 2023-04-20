@@ -22,9 +22,19 @@ public class King extends Piece {
         localMoves.add(new int[]{row + 1, col + 1}); // bottom right
         localMoves.add(new int[]{row + 1, col - 1}); // bottom left
         //Utils.printMoves(localMoves);
+        ArrayList<int[]> validMoves = new ArrayList<>();
+        Piece value;
+        for (int [] move : localMoves){
+            if (Utils.withinMatrix(move)){
+                value = matrix[move[0]][move[1]];
+                if (value != null && value.color.equals(color))
+                    continue;
+                validMoves.add(move);
+            }
+        }
 
 
         //Utils.printMoves(this.legalMoves);
-        return  localMoves;
+        return  validMoves;
     }
 }

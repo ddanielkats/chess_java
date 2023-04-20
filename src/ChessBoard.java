@@ -21,7 +21,7 @@ public class ChessBoard extends JFrame {
     private ArrayList<Piece> white_pieces, black_pieces, all_pieces;
     public boolean white_in_check, black_in_check, white_in_mate, black_in_mate, stalemate;
 
-    private final int search_depth = 1;
+    private final int search_depth = 3;
 
     public ChessBoard(Piece[][] mat) {
         setTitle("Chess Board");
@@ -129,12 +129,10 @@ public class ChessBoard extends JFrame {
 
     public void updateBoard() {
 
-        /*if (turn == PieceColor.BLACK) {
+        if (turn == PieceColor.BLACK) {
             System.out.println("minimax : " + (minimax(search_depth, false)));
             turn = PieceColor.WHITE;
-            System.out.print("black pieces after function : ");
-            Utils.printPieces(black_pieces);
-        }*/
+        }
 
 
 
@@ -162,7 +160,8 @@ public class ChessBoard extends JFrame {
 
 
         // Draw the pieces
-        for (Piece piece : all_pieces)
+        ArrayList<Piece> ap = new ArrayList<>(all_pieces);
+        for (Piece piece : ap)
             piece.draw(g);
         //Utils.printPieces(black_pieces);
         //black_pieces.get(0).showLegalMoves(g, matrix);
@@ -339,7 +338,6 @@ public class ChessBoard extends JFrame {
         ArrayList<Piece> originalBlack = new ArrayList<>(black_pieces);
         ArrayList<Piece> originalAll = new ArrayList<>(all_pieces);
         if (isMaximizing) {
-            System.out.println("maximizing");
             int maxEval = Integer.MIN_VALUE;
             for (Piece piece : originalWhite) {
                 ArrayList<int[]> originalLegal = new ArrayList<>(piece.legalMoves);
@@ -377,7 +375,8 @@ public class ChessBoard extends JFrame {
                             black_pieces.add(target);
                             all_pieces.add(target);
                         }
-
+                        for (Piece piece_ : all_pieces)
+                            piece_.getLegalMoves(matrix);
                     }
                 }
 
@@ -389,12 +388,12 @@ public class ChessBoard extends JFrame {
         }
 
         else {
-            System.out.println("minimizing");
             int minEval = Integer.MAX_VALUE;
             for (Piece piece : originalBlack) {
                 ArrayList<int[]> originalLegal = new ArrayList<>(piece.legalMoves);
                 for (int [] move : originalLegal) {
                     if (simulateMove(piece, move)) {
+
                         //remember before move
                         target = matrix[move[0]][move[1]];
                         originalPos = piece.pos;
@@ -413,6 +412,7 @@ public class ChessBoard extends JFrame {
                             bestMove = move;
                         }
 
+
                         //unmake move
                         piece.move(originalPos, matrix);
                         white_in_check = wc;
@@ -425,18 +425,17 @@ public class ChessBoard extends JFrame {
                             white_pieces.add(target);
                             all_pieces.add(target);
                         }
+                        for (Piece piece_ : all_pieces)
+                            piece_.getLegalMoves(matrix);
                     }
                 }
-                System.out.print("black pieces after all moves of : " + piece);
-                System.out.println();
-                Utils.printPieces(black_pieces);
             }
 
 
 
 
             if (depth == search_depth) {
-                System.out.print("moving black to ");
+                System.out.print("moving " + bestPiece + "to");
                 Utils.printMove(bestMove);
                 movePiece(bestPiece, bestMove);
 

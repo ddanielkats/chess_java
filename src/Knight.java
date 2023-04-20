@@ -25,10 +25,18 @@ public class Knight extends Piece {
         localMoves.add(new int[] {row + 2, col - 1}); // two down one left
         localMoves.add(new int[] {row + 1, col - 2}); // one down two left
 
+        ArrayList<int[]> moves = new ArrayList<>();
+        for (int[] move : localMoves){
+            if (Utils.withinMatrix(move)) {
+                if (Utils.matrixIn(matrix, move) != null && Utils.matrixIn(matrix, move).color == this.color)
+                    continue;
+                moves.add(move);
+            }
 
+        }
 
 
         //Utils.printMoves(this.legalMoves);
-        return  localMoves;
+        return  moves;
     }
 }
