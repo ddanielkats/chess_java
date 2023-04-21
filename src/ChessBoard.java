@@ -353,7 +353,7 @@ public class ChessBoard extends JFrame {
         int [] bestMove = new int[2];
         int [] originalPos = new int[2];
         ArrayList<Piece> originalWhite = new ArrayList<>(white_pieces);
-        ArrayList<Piece> originalBlack = new ArrayList<>(black_pieces);
+        ArrayList<Piece> originalBlack = Utils.shuffleArray(black_pieces);
         ArrayList<Piece> originalAll = new ArrayList<>(all_pieces);
         if (isMaximizing) {
             int maxEval = Integer.MIN_VALUE;
@@ -372,7 +372,7 @@ public class ChessBoard extends JFrame {
 
 
                         movePiece(piece, move);
-                        //updateBoard();
+                        panel.repaint();
                         int evaluation = minimax(depth - 1, false);
                         if (evaluation > maxEval) {
                             maxEval = evaluation;
@@ -423,7 +423,7 @@ public class ChessBoard extends JFrame {
 
                         //make the move
                         movePiece(piece, move);
-                        //updateBoard();
+                        panel.repaint();
                         int evaluation = minimax( depth - 1, true);
                         if (evaluation < minEval) {
                             minEval = evaluation;

@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Utils {
 
@@ -136,5 +138,19 @@ public class Utils {
 
 
     }*/
+
+    static ArrayList<Piece> shuffleArray(ArrayList<Piece> array) {
+        // If running on Java 6 or older, use `new Random()` on RHS here
+        ArrayList<Piece> ar = new ArrayList<>(array);
+        Random rnd = ThreadLocalRandom.current();
+        for (int i = ar.size() - 1; i > 0; i--) {
+            int index = rnd.nextInt(i + 1);
+            // Simple swap
+            Piece a = ar.get(index);
+            ar.set(index, ar.get(i));
+            ar.set(i, a);
+        }
+        return ar;
+    }
 
 }
