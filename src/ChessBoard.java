@@ -180,22 +180,40 @@ public class ChessBoard extends JFrame {
         boolean white_check = this.white_in_check;
         boolean black_check = this.black_in_check;
         int[] original_pos = piece.pos;
+
+
         // make the move
         Piece target = matrix[new_pos[0]][new_pos[1]];
         piece.move(new_pos, this.matrix);
+        if (target != null){
+            if (target.color == PieceColor.WHITE)
+                white_pieces.remove(target);
+            else
+                black_pieces.remove(target);
+            all_pieces.remove(target);
+        }
+
+
         // update the pieces legal moves
         for (Piece piece_ : all_pieces) {
             piece_.getLegalMoves(this.matrix);
         }
 
         this.calculateCheck();
-        // return everything back to normal if it's king is in check after the move
+        // if the king is still in check after the move
         if ((piece.color == PieceColor.WHITE && this.white_in_check) ||
                 (piece.color == PieceColor.BLACK && this.black_in_check)) {
             // System.out.println("can't make this move");
             status = false;
         }
         // return everything to normal because it's only a simulation and only returns bool
+        if (target != null){
+            if (target.color == PieceColor.WHITE)
+                white_pieces.add(target);
+            else
+                black_pieces.add(target);
+            all_pieces.add(target);
+        }
         piece.move(original_pos, this.matrix);
         matrix[new_pos[0]][new_pos[1]] = target;
         white_in_check = white_check;
@@ -271,7 +289,7 @@ public class ChessBoard extends JFrame {
         }
 
         piece.move(new_pos, matrix);
-
+        piece.moveNumber += 1;
 
 
         for (Piece p : all_pieces) {
@@ -369,6 +387,7 @@ public class ChessBoard extends JFrame {
                         black_in_check = bc;
                         white_in_mate = wm;
                         black_in_mate = bm;
+                        piece.moveNumber --;
                         if (target != null)
                         {
                             matrix[move[0]][move[1]] = target;
@@ -419,6 +438,7 @@ public class ChessBoard extends JFrame {
                         black_in_check = bc;
                         white_in_mate = wm;
                         black_in_mate = bm;
+                        piece.moveNumber --;
                         if (target != null)
                         {
                             matrix[move[0]][move[1]] = target;

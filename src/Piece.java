@@ -41,7 +41,6 @@ public abstract class Piece {
         matrix[pos[0]][pos[1]] = null;
         matrix[newPos[0]][newPos[1]] = this;
         this.pos = newPos;
-        this.moveNumber += 1;
     }
 
     protected void goToDir(Piece[][] matrix, int[] direction, ArrayList<int[]> arr) {
