@@ -1,9 +1,10 @@
-fix mate and check to feature stalemate, also fix the white_in_mate boolean because it's not currect for stalemate (
-maybe use return from mate in movePiece and not update the bool in mate)
+
 
 simulate moves is inefficient because it calculates all legal moves 2 times
 when calculating legal moves, remember all moves that contain a king, and the calculate check will be more efficient
+
 minimax:
+    add alpha-beta pruning
     when black gets mated it errors
     moves update weirdly when calculating for some reason
 
