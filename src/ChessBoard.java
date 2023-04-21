@@ -5,6 +5,7 @@ import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.TimeUnit;
 
 public class ChessBoard extends JFrame {
     private JPanel panel;
@@ -21,7 +22,7 @@ public class ChessBoard extends JFrame {
     private ArrayList<Piece> white_pieces, black_pieces, all_pieces;
     public boolean white_in_check, black_in_check, white_in_mate, black_in_mate, stalemate;
 
-    private final int search_depth = 3;
+
 
     public ChessBoard(Piece[][] mat) {
         setTitle("Chess Board");
@@ -61,6 +62,8 @@ public class ChessBoard extends JFrame {
         }
         all_pieces.addAll(white_pieces);
         all_pieces.addAll(black_pieces);
+        white_pieces = Utils.shuffleArray(white_pieces);
+        black_pieces = Utils.shuffleArray(black_pieces);
 
 
         // Create a new JPanel to hold the chess board and pieces
@@ -129,14 +132,42 @@ public class ChessBoard extends JFrame {
 
     public void updateBoard() {
 
+        //System.out.println("-----------" + turn);
+        long startTime = System.currentTimeMillis();
+
         if (turn == PieceColor.BLACK) {
-            System.out.println("minimax : " + (minimax(search_depth, false)));
-            turn = PieceColor.WHITE;
+            System.out.println("minimax : " + (minimax(Constants.search_depth, false)));
         }
 
+        if (Constants.against_self) {
+                if (turn == PieceColor.WHITE) {
+                    System.out.println("minimax : " + (minimax(Constants.search_depth, true)));
+                }
 
+
+            long endTime = System.currentTimeMillis();
+            long codeTime = endTime - startTime;
+
+            /*if (codeTime < 1000) {
+                System.out.println("delaying");
+                try {
+                    Thread.sleep(1000 - codeTime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }*/
+
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }
 
         panel.repaint();
+
+
     }
 
     public void draw(Graphics g) {
@@ -348,12 +379,15 @@ public class ChessBoard extends JFrame {
         if (depth == 0)
             return evaluateBoard();
 
+        if (Constants.show_calculations)
+            panel.repaint();
+
         // piece, move
         Piece bestPiece = null, target = null;
         int [] bestMove = new int[2];
         int [] originalPos = new int[2];
         ArrayList<Piece> originalWhite = new ArrayList<>(white_pieces);
-        ArrayList<Piece> originalBlack = Utils.shuffleArray(black_pieces);
+        ArrayList<Piece> originalBlack = new ArrayList<>(black_pieces);
         ArrayList<Piece> originalAll = new ArrayList<>(all_pieces);
         if (isMaximizing) {
             int maxEval = Integer.MIN_VALUE;
@@ -372,7 +406,6 @@ public class ChessBoard extends JFrame {
 
 
                         movePiece(piece, move);
-                        panel.repaint();
                         int evaluation = minimax(depth - 1, false);
                         if (evaluation > maxEval) {
                             maxEval = evaluation;
@@ -401,6 +434,14 @@ public class ChessBoard extends JFrame {
 
             }
 
+            if (depth == Constants.search_depth && turn == PieceColor.WHITE) {
+                System.out.print("moving " + bestPiece + " to ");
+                Utils.printMove(bestMove);
+                movePiece(bestPiece, bestMove);
+                turn = Utils.otherTeam(turn);
+
+            }
+
             return maxEval;
 
 
@@ -423,7 +464,6 @@ public class ChessBoard extends JFrame {
 
                         //make the move
                         movePiece(piece, move);
-                        panel.repaint();
                         int evaluation = minimax( depth - 1, true);
                         if (evaluation < minEval) {
                             minEval = evaluation;
@@ -454,10 +494,11 @@ public class ChessBoard extends JFrame {
 
 
 
-            if (depth == search_depth) {
-                System.out.print("moving " + bestPiece + "to");
+            if (depth == Constants.search_depth && turn == PieceColor.BLACK) {
+                System.out.print("moving " + bestPiece + " to ");
                 Utils.printMove(bestMove);
                 movePiece(bestPiece, bestMove);
+                turn = Utils.otherTeam(turn);
 
             }
 

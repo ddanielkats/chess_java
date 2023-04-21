@@ -4,13 +4,13 @@ public class Main {
 
     // Create the pieces and place them on the board
      static Piece[][] test = new Piece[][]{
+            {new King(PieceColor.BLACK), null, null, null, null, null, null, null},
             {null, null, null, null, null, null, null, null},
             {null, null, null, null, null, null, null, null},
             {null, null, null, null, null, null, null, null},
-            {null, null, null, null, null, null, null, null},
-            {null, null, null, null, null, null, null, null},
-            {null, new Knight(PieceColor.BLACK), null, null, null, null, null, null},
-            {null, null, new Queen(PieceColor.WHITE),new King(PieceColor.WHITE), null, null, null, null},
+            {new Queen(PieceColor.BLACK), null, null, null, null, null, null, null},
+            {new Rook(PieceColor.BLACK), null, null, null, null, null, null, null},
+            {null, null, null,new King(PieceColor.WHITE), null, null, null, null},
             {null, null, null, null, null, null, null, null}
      };
 
