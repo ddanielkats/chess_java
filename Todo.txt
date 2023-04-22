@@ -14,4 +14,6 @@ minimax:
 
 change calculate check to scan to all directions from king, and the checking the pieces that collide with the scan
 add pawn promotion
-add castling
+add castling:
+    the problem is minimax un-makes moves manually so casling won't work there
+    to it so that when calculating legal moves, moves that can disable castling will be saved somewhere (moves that are back rank)

@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ChessBoard extends JFrame {
     private JPanel panel;
-    private Piece[][] matrix;
+    public Piece[][] matrix;
 
     private int click_count;
     private int [] click_pos;
@@ -120,8 +120,10 @@ public class ChessBoard extends JFrame {
         {
             //System.out.println(mousePos[0] + ", " + mousePos[1]);
             selected_piece = matrix[mousePos[0]][mousePos[1]];
-            if (selected_piece == null )//|| !turn.equals(selected_piece.color))
+            if ((selected_piece == null ) || turn != selected_piece.color){
                 click_count = 0;
+                selected_piece = null;
+            }
 
 
         }
@@ -129,7 +131,7 @@ public class ChessBoard extends JFrame {
         if (click_count == 2){
             if (Utils.inList(selected_piece.legalMoves, mousePos)) {
                 if (this.movePiece(selected_piece, mousePos, false))
-                    turn = Utils.otherTeam(turn);
+                    change_turn();
             }
 
         click_count = 0;
@@ -139,6 +141,10 @@ public class ChessBoard extends JFrame {
     }
 
     public void updateBoard() {
+        panel.repaint();
+
+        if (!Constants.against_pc)
+            return;
 
         long startTime = System.currentTimeMillis();
 
@@ -147,7 +153,6 @@ public class ChessBoard extends JFrame {
         }
 
         if (!Constants.against_self) {
-            panel.repaint();
             return;
         }
 
@@ -175,7 +180,6 @@ public class ChessBoard extends JFrame {
         }
 
 
-        panel.repaint();
 
 
     }
@@ -213,7 +217,12 @@ public class ChessBoard extends JFrame {
     }
 
 
-
+    public void change_turn()
+    {
+        turn = Utils.otherTeam(turn);
+        Castling.threatening_white.clear();
+        Castling.threatening_black.clear();
+    }
 
     public boolean simulateMove(Piece piece, int[] new_pos) {
         // copying original data
@@ -448,7 +457,7 @@ public class ChessBoard extends JFrame {
                 System.out.print("moving " + bestPiece + " to ");
                 Utils.printMove(bestMove);
                 movePiece(bestPiece, bestMove, true);
-                turn = Utils.otherTeam(turn);
+                change_turn();
 
             }
 
@@ -508,7 +517,7 @@ public class ChessBoard extends JFrame {
                 System.out.print("moving " + bestPiece + " to ");
                 Utils.printMove(bestMove);
                 movePiece(bestPiece, bestMove, true);
-                turn = Utils.otherTeam(turn);
+                change_turn();
 
             }
 

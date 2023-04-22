@@ -30,8 +30,6 @@ public class Main {
     public static void main(String[] args) {
         Piece[][] matrix = normal;
         ChessBoard board = new ChessBoard(matrix);
-        board.setVisible(true);
-        Piece selected_piece = null;
         while (true)
         {
             board.updateBoard();
