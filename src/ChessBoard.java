@@ -29,7 +29,7 @@ public class ChessBoard extends JFrame {
         //getContentPane().setSize(square_size * 8, square_size * 8);
         //setSize(square_size * 8, square_size * 8);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
+        setVisible(true);
         this.matrix = mat;
         click_count = 0;
         turn = PieceColor.WHITE;
@@ -88,7 +88,15 @@ public class ChessBoard extends JFrame {
 
 
         pack();
+        // put it in the middle of the screen
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Point middle = new Point(screenSize.width / 2, screenSize.height / 2);
+        Point newLocation = new Point(middle.x - (this.getWidth() / 2),
+                middle.y - (this.getHeight() / 2));
+        this.setLocation(newLocation);
     }
+
+
 
     public void processMouseEvent(MouseEvent e) {
         // Get the x and y coordinates of the mouse click
@@ -132,38 +140,40 @@ public class ChessBoard extends JFrame {
 
     public void updateBoard() {
 
-        //System.out.println("-----------" + turn);
         long startTime = System.currentTimeMillis();
 
         if (turn == PieceColor.BLACK) {
             System.out.println("minimax : " + (minimax(Constants.search_depth, false)));
         }
 
-        if (Constants.against_self) {
-                if (turn == PieceColor.WHITE) {
-                    System.out.println("minimax : " + (minimax(Constants.search_depth, true)));
-                }
+        if (!Constants.against_self) {
+            panel.repaint();
+            return;
+        }
+
+        if (turn == PieceColor.WHITE) {
+            System.out.println("minimax : " + (minimax(Constants.search_depth, true)));
+        }
 
 
-            long endTime = System.currentTimeMillis();
-            long codeTime = endTime - startTime;
+        long endTime = System.currentTimeMillis();
+        long codeTime = endTime - startTime;
 
-            /*if (codeTime < 1000) {
-                System.out.println("delaying");
-                try {
-                    Thread.sleep(1000 - codeTime);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }*/
-
+        /*if (codeTime < 1000) {
+            System.out.println("delaying");
             try {
-                Thread.sleep(2000);
+                Thread.sleep(1000 - codeTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }*/
 
+        try {
+            Thread.sleep(2000); // 2 seconds
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
+
 
         panel.repaint();
 
@@ -245,13 +255,13 @@ public class ChessBoard extends JFrame {
                 black_pieces.add(target);
             all_pieces.add(target);
         }
-        piece.move(original_pos, this.matrix);
+        piece.move(original_pos, matrix);
         matrix[new_pos[0]][new_pos[1]] = target;
         white_in_check = white_check;
         black_in_check = black_check;
         // update the pieces legal moves
         for (Piece piece_ : all_pieces) {
-            piece_.getLegalMoves(this.matrix);
+            piece_.getLegalMoves(matrix);
         }
         return status;
     }
@@ -508,5 +518,101 @@ public class ChessBoard extends JFrame {
 
     }
 
+
+
+    /*int evaluateBoard()
+    {
+        int white_sum = 0;
+        int black_sum = 0;
+
+        for (Piece piece : white_pieces){
+            white_sum += piece.value;
+        }
+        for (Piece piece : black_pieces){
+            black_sum += piece.value;
+        }
+
+        int evaluation = white_sum - black_sum;
+        int perspective = turn == PieceColor.WHITE ? 1 : -1;
+
+
+        return evaluation * perspective;
+
+    }
+
+    int minimax(int depth, boolean lol) {
+        if (stalemate)
+            return 0;
+
+        if (white_in_mate || black_in_mate)
+            return Integer.MIN_VALUE;
+
+
+        if (depth == 0)
+            return evaluateBoard();
+
+
+        ArrayList<Piece> team = turn == PieceColor.WHITE ?
+                new ArrayList<>(white_pieces) : new ArrayList<>(black_pieces);
+        ArrayList<Piece> other_team = turn == PieceColor.WHITE ? black_pieces : white_pieces;
+
+        Piece bestPiece = null, target = null;
+        int[] bestMove = new int[2];
+        int[] originalPos = new int[2];
+        int bestEval = Integer.MIN_VALUE;
+
+        for (Piece piece : team) {
+            for (int[] move : new ArrayList<>(piece.legalMoves)) {
+                if (simulateMove(piece, move)) {
+
+                    //remember before move
+                    target = matrix[move[0]][move[1]];
+                    originalPos = piece.pos;
+                    boolean wc = white_in_check;
+                    boolean bc = black_in_check;
+                    boolean wm = white_in_mate;
+                    boolean bm = black_in_mate;
+
+                    //make the move
+                    movePiece(piece, move, true);
+                    int evaluation = -minimax(depth - 1, true);
+                    if (evaluation > bestEval) {
+                        bestEval = evaluation;
+                        bestPiece = piece;
+                        bestMove = move;
+                    }
+
+
+                    //unmake move
+                    piece.move(originalPos, matrix);
+                    white_in_check = wc;
+                    black_in_check = bc;
+                    white_in_mate = wm;
+                    black_in_mate = bm;
+                    piece.moveNumber--;
+                    if (target != null) {
+                        matrix[move[0]][move[1]] = target;
+                        other_team.add(target);
+                        all_pieces.add(target);
+                    }
+                    for (Piece piece_ : all_pieces)
+                        piece_.getLegalMoves(matrix);
+
+
+                }
+
+            }
+        }
+
+        if (depth == Constants.search_depth && turn == PieceColor.BLACK) {
+            System.out.print("moving " + bestPiece + " to ");
+            Utils.printMove(bestMove);
+            movePiece(bestPiece, bestMove, true);
+            turn = Utils.otherTeam(turn);
+
+        }
+        return bestEval;
+
+    }*/
 
 }
