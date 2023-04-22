@@ -120,7 +120,7 @@ public class ChessBoard extends JFrame {
 
         if (click_count == 2){
             if (Utils.inList(selected_piece.legalMoves, mousePos)) {
-                if (this.movePiece(selected_piece, mousePos))
+                if (this.movePiece(selected_piece, mousePos, false))
                     turn = Utils.otherTeam(turn);
             }
 
@@ -303,9 +303,9 @@ public class ChessBoard extends JFrame {
     }
 
 
-    public boolean movePiece(Piece piece, int [] new_pos)
+    public boolean movePiece(Piece piece, int [] new_pos, boolean inSearch)
     {
-        if (! this.simulateMove(piece, new_pos))
+        if ( !inSearch && !this.simulateMove(piece, new_pos))
             return false;
 
         Piece killed_piece;
@@ -405,7 +405,7 @@ public class ChessBoard extends JFrame {
 
 
 
-                        movePiece(piece, move);
+                        movePiece(piece, move, true);
                         int evaluation = minimax(depth - 1, false);
                         if (evaluation > maxEval) {
                             maxEval = evaluation;
@@ -437,7 +437,7 @@ public class ChessBoard extends JFrame {
             if (depth == Constants.search_depth && turn == PieceColor.WHITE) {
                 System.out.print("moving " + bestPiece + " to ");
                 Utils.printMove(bestMove);
-                movePiece(bestPiece, bestMove);
+                movePiece(bestPiece, bestMove, true);
                 turn = Utils.otherTeam(turn);
 
             }
@@ -463,7 +463,7 @@ public class ChessBoard extends JFrame {
                         boolean bm = black_in_mate;
 
                         //make the move
-                        movePiece(piece, move);
+                        movePiece(piece, move, true);
                         int evaluation = minimax( depth - 1, true);
                         if (evaluation < minEval) {
                             minEval = evaluation;
@@ -497,7 +497,7 @@ public class ChessBoard extends JFrame {
             if (depth == Constants.search_depth && turn == PieceColor.BLACK) {
                 System.out.print("moving " + bestPiece + " to ");
                 Utils.printMove(bestMove);
-                movePiece(bestPiece, bestMove);
+                movePiece(bestPiece, bestMove, true);
                 turn = Utils.otherTeam(turn);
 
             }

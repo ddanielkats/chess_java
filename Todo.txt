@@ -4,6 +4,9 @@ simulate moves is inefficient because it calculates all legal moves 2 times
 when calculating legal moves, remember all moves that contain a king, and the calculate check will be more efficient
 
 minimax:
+    add the fact that the team with most threats gets 1 point
+    add bonus to eat with pawn rather than with other piece
+    punish for eating with king (making king more exposed) [add king safety bonus]
     add alpha-beta pruning
     when black gets mated it errors
     moves update weirdly when calculating for some reason
