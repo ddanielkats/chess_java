@@ -7,11 +7,16 @@ public class MoveMap {
 
     }
 
-    private static String getSquare(int[] move)
+    public static String getLetter(int n)
+    {
+        return "" + (char) ('a' + n);
+    }
+
+    public static String getSquare(int[] move)
     {
 
         char col = (char) ('a' + move[1]);
-        String row = String.valueOf ((7 - move[0]));
+        String row = String.valueOf ((8 - move[0]));
 
         return "" + col + row;
 

@@ -117,6 +117,6 @@ public abstract class Piece {
 
     @Override
     public String toString() {
-        return color + "_" + name;
+        return color.name().charAt(0) + "_" + name.charAt(0);
     }
 }
