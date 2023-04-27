@@ -146,6 +146,8 @@ public class ChessBoard extends JFrame {
 
     public void makeBotMove() {
 
+        white_pieces = Utils.shuffleArray(white_pieces);
+        black_pieces = Utils.shuffleArray(black_pieces);
 
         if (!Constants.do_minimax)
             return;
@@ -167,20 +169,17 @@ public class ChessBoard extends JFrame {
 
         long endTime = System.currentTimeMillis();
         long codeTime = endTime - startTime;
-
         if (codeTime < 1000) {
-            System.out.println("delaying");
             try {
+                System.out.println("delaying");
                 Thread.sleep(1000 - codeTime);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
 
+        makeBotMove();
 
-
-        white_pieces = Utils.shuffleArray(white_pieces);
-        black_pieces = Utils.shuffleArray(black_pieces);
 
 
     }
@@ -245,17 +244,20 @@ public class ChessBoard extends JFrame {
 
     }
 
+    public void immediate_paint(){
+        panel.paintImmediately(new Rectangle(0, 0, Constants.square_size * 8, Constants.square_size * 8));
+    }
 
     public void change_turn()
     {
-        System.out.println(turn);
+        //System.out.println(turn);
         turn = Utils.otherTeam(turn);
         Castling.threatening_white.clear();
         Castling.threatening_black.clear();
         selected_piece = null;
-        panel.paintImmediately(new Rectangle(0, 0, Constants.square_size * 8, Constants.square_size * 8));
+        immediate_paint();
         //this.getContentPane().repaint();
-        makeBotMove();
+        if (!Constants.against_self) makeBotMove();
 
     }
 
@@ -346,6 +348,14 @@ public class ChessBoard extends JFrame {
         }
 
 
+        /*panel.paintImmediately(new Rectangle(0, 0, Constants.square_size * 8, Constants.square_size * 8));
+        try {
+            System.out.println("I see mate");
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+
         // mate
         if (color == PieceColor.WHITE) {
             white_in_mate = true;
@@ -396,8 +406,8 @@ public class ChessBoard extends JFrame {
         if (stalemate) {
             System.out.println("stalemate");
         }
-        if (!stalemate && (black_in_mate || white_in_mate))
-            System.out.println("mate");
+        //if (!stalemate && (black_in_mate || white_in_mate))
+        //    System.out.println("mate");
 
 
 
@@ -438,7 +448,7 @@ public class ChessBoard extends JFrame {
             return evaluateBoard();
 
         if (Constants.show_calculations)
-            panel.repaint();
+            immediate_paint();
 
         // piece, move
         Piece bestPiece = null, target = null;
@@ -500,7 +510,7 @@ public class ChessBoard extends JFrame {
             }
 
             if (depth == Constants.search_depth && turn == PieceColor.WHITE) {
-                System.out.println("moving " + bestPiece + " to " + MoveMap.getSquare(bestMove));
+                //System.out.println("moving " + bestPiece + " to " + MoveMap.getSquare(bestMove));
                 movePiece(bestPiece, bestMove, true);
                 change_turn();
 
@@ -563,7 +573,7 @@ public class ChessBoard extends JFrame {
 
             //System.out.println(MoveMap.getSquare(bestMove));
             if (depth == Constants.search_depth && turn == PieceColor.BLACK) {
-                System.out.println("moving " + bestPiece + " to " + MoveMap.getSquare(bestMove));
+                //System.out.println("moving " + bestPiece + " to " + MoveMap.getSquare(bestMove));
                 movePiece(bestPiece, bestMove, true);
                 change_turn();
 
