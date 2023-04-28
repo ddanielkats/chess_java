@@ -45,8 +45,8 @@ public class Main {
     public static void main(String[] args) {
         Piece[][] matrix = normal;
         ChessBoard board = new ChessBoard(matrix);
-        board.makeBotMove();
-
+        if (Constants.against_self && board.move_num == 0)
+            board.makeBotMove();
 
     }
 }

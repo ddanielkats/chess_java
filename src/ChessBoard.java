@@ -4,8 +4,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.TimeUnit;
 
 public class ChessBoard extends JFrame {
     private JPanel panel;
@@ -22,8 +20,11 @@ public class ChessBoard extends JFrame {
     private ArrayList<Piece> white_pieces, black_pieces, all_pieces;
     public boolean white_in_check, black_in_check, white_in_mate, black_in_mate, stalemate;
 
+    public String move_sequence = "";
     int [] start_move;
     int [] end_move;
+
+    int move_num;
 
 
     public ChessBoard(Piece[][] mat) {
@@ -34,6 +35,7 @@ public class ChessBoard extends JFrame {
         setVisible(true);
         this.matrix = mat;
         click_count = 0;
+        move_num = 0;
         turn = PieceColor.WHITE;
         white_in_check = false;
         black_in_check = false;
@@ -44,7 +46,6 @@ public class ChessBoard extends JFrame {
         white_pieces = new ArrayList<Piece>();
         black_pieces = new ArrayList<Piece>();
         all_pieces = new ArrayList<Piece>();
-
 
 
         for (int i = 0; i < 8; i++)
@@ -120,7 +121,6 @@ public class ChessBoard extends JFrame {
 
         if (click_count == 1)
         {
-            //System.out.println(mousePos[0] + ", " + mousePos[1]);
             selected_piece = matrix[mousePos[0]][mousePos[1]];
             if ((selected_piece == null ) || turn != selected_piece.color){
                 click_count = 0;
@@ -144,45 +144,7 @@ public class ChessBoard extends JFrame {
 
     }
 
-    public void makeBotMove() {
 
-        white_pieces = Utils.shuffleArray(white_pieces);
-        black_pieces = Utils.shuffleArray(black_pieces);
-
-        if (!Constants.do_minimax)
-            return;
-
-        long startTime = System.currentTimeMillis();
-
-        if (turn == PieceColor.BLACK) {
-            System.out.println("minimax : " + (minimax(Constants.search_depth, Integer.MIN_VALUE, Integer.MAX_VALUE, false)));
-        }
-
-        if (!Constants.against_self) {
-            return;
-        }
-
-        if (turn == PieceColor.WHITE) {
-            System.out.println("minimax : " + (minimax(Constants.search_depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true)));
-        }
-
-
-        long endTime = System.currentTimeMillis();
-        long codeTime = endTime - startTime;
-        if (codeTime < 1000) {
-            try {
-                System.out.println("delaying");
-                Thread.sleep(1000 - codeTime);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        makeBotMove();
-
-
-
-    }
 
     public void showLastMove(Graphics g)
     {
@@ -236,7 +198,6 @@ public class ChessBoard extends JFrame {
         ArrayList<Piece> ap = new ArrayList<>(all_pieces);
         for (Piece piece : ap)
             piece.draw(g);
-        //Utils.printPieces(black_pieces);
         //black_pieces.get(0).showLegalMoves(g, matrix);
 
         if (selected_piece != null)
@@ -248,18 +209,115 @@ public class ChessBoard extends JFrame {
         panel.paintImmediately(new Rectangle(0, 0, Constants.square_size * 8, Constants.square_size * 8));
     }
 
+
+
+    public void makeBotMove() {
+
+        white_pieces = Utils.shuffleArray(white_pieces);
+        black_pieces = Utils.shuffleArray(black_pieces);
+
+        if (move_num > 0 && move_num <= 10){
+            makeMapMove();
+            return;
+        }
+
+
+        long startTime = System.currentTimeMillis();
+
+        if (turn == PieceColor.BLACK) {
+            System.out.println("minimax : " + (minimax(Constants.search_depth, Integer.MIN_VALUE, Integer.MAX_VALUE, false)));
+        }
+
+
+
+        if (turn == PieceColor.WHITE && Constants.against_self) {
+            System.out.println("minimax : " + (minimax(Constants.search_depth, Integer.MIN_VALUE, Integer.MAX_VALUE, true)));
+        }
+
+
+        long endTime = System.currentTimeMillis();
+        long codeTime = endTime - startTime;
+        if (codeTime < 1000) {
+            try {
+                Thread.sleep(1000 - codeTime);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
+    }
+
     public void change_turn()
     {
-        //System.out.println(turn);
         turn = Utils.otherTeam(turn);
-        Castling.threatening_white.clear();
-        Castling.threatening_black.clear();
         selected_piece = null;
         immediate_paint();
         //this.getContentPane().repaint();
-        if (!Constants.against_self) makeBotMove();
+        if (! Constants.do_minimax)
+            return;
+        if (Constants.against_self || turn == PieceColor.BLACK)
+            makeBotMove();
+
 
     }
+
+
+    public void makeMapMove(){
+        String move_str = MoveMap.getNextMove(move_sequence);
+        if (move_str == null)
+        {
+            move_num = 11;
+            makeBotMove();
+            return;
+        }
+
+        System.out.println(move_str);
+        char first_letter = move_str.charAt(0);
+
+        int[] new_pos = MoveMap.getMove( move_str.substring(move_str.length() - 2));
+        int col = new_pos[1];
+        Piece moving_piece = null;
+        // find which piece to move
+        // pawn move
+        if (move_str.length() == 2){
+            for (int i = 0; i < 7 ; i++){
+                moving_piece = matrix[i][col];
+                if (moving_piece != null && moving_piece.name.equals("pawn") && moving_piece.color == turn){
+                    break;
+                }
+
+            }
+
+        }
+
+
+        else if(move_str.length() > 2){
+            //other piece class
+
+            Piece sim = Piece.getPiece(first_letter, Utils.otherTeam(turn));
+            sim.pos = new_pos;
+            Piece p;
+            // simulate a piece in the end square,
+            // ift one of it's legal moves contains the same class the that's the piece to move
+            for (int[] m : sim.getPseudoMoves(matrix)) {
+                p = matrix[m[0]][m[1]];
+                if (p != null &&
+                        p.name.equals(sim.name)) {
+                    //found the piece that has to move to that square
+                    moving_piece = p;
+                    break;
+                }
+
+            }
+        }
+        // move the piece
+        movePiece(moving_piece, new_pos, false);
+        change_turn();
+
+    }
+
 
     public boolean simulateMove(Piece piece, int[] new_pos) {
         // copying original data
@@ -290,7 +348,6 @@ public class ChessBoard extends JFrame {
         // if the king is still in check after the move
         if ((piece.color == PieceColor.WHITE && this.white_in_check) ||
                 (piece.color == PieceColor.BLACK && this.black_in_check)) {
-            // System.out.println("can't make this move");
             status = false;
         }
         // return everything to normal because it's only a simulation and only returns bool
@@ -322,7 +379,6 @@ public class ChessBoard extends JFrame {
                 Piece target = Utils.matrixIn(matrix, move);
                 // if a king is in check
                 if (Utils.isPiece(target) && target.name.equals("king") && target.color != piece.color) {
-                    // System.out.println(target.getColor() + " king is in check");
                     if (target.color == PieceColor.WHITE)
                         white_in_check = true;
                     else
@@ -348,13 +404,7 @@ public class ChessBoard extends JFrame {
         }
 
 
-        /*panel.paintImmediately(new Rectangle(0, 0, Constants.square_size * 8, Constants.square_size * 8));
-        try {
-            System.out.println("I see mate");
-            Thread.sleep(10000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
+
 
         // mate
         if (color == PieceColor.WHITE) {
@@ -372,7 +422,9 @@ public class ChessBoard extends JFrame {
         if ( !inSearch && !this.simulateMove(piece, new_pos))
             return false;
 
-
+        if (!inSearch) {
+            move_sequence = move_sequence + MoveMap.getMapMove(piece, new_pos, matrix) + " ";
+        }
         start_move = piece.pos;
         end_move = new_pos;
 
@@ -389,7 +441,8 @@ public class ChessBoard extends JFrame {
         }
 
         piece.move(new_pos, matrix);
-        piece.moveNumber += 1;
+        piece.moveNumber ++;
+        move_num ++;
 
 
         for (Piece p : all_pieces) {
@@ -438,7 +491,6 @@ public class ChessBoard extends JFrame {
             return 0;
 
         if (white_in_mate) {
-            //Utils.printMatrix(matrix);
             return Integer.MIN_VALUE;
         }
         if (black_in_mate) {
@@ -510,8 +562,7 @@ public class ChessBoard extends JFrame {
             }
 
             if (depth == Constants.search_depth && turn == PieceColor.WHITE) {
-                //System.out.println("moving " + bestPiece + " to " + MoveMap.getSquare(bestMove));
-                movePiece(bestPiece, bestMove, true);
+                movePiece(bestPiece, bestMove, false);
                 change_turn();
 
             }
@@ -571,10 +622,8 @@ public class ChessBoard extends JFrame {
             }
 
 
-            //System.out.println(MoveMap.getSquare(bestMove));
             if (depth == Constants.search_depth && turn == PieceColor.BLACK) {
-                //System.out.println("moving " + bestPiece + " to " + MoveMap.getSquare(bestMove));
-                movePiece(bestPiece, bestMove, true);
+                movePiece(bestPiece, bestMove, false);
                 change_turn();
 
             }

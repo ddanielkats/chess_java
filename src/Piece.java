@@ -47,24 +47,18 @@ public abstract class Piece {
         int flag = 0;
         int[] step = new int[] {direction[0] - pos[0], direction[1] - pos[1]};
         for (int i = 0; i < 7; i++) {
-            if (Utils.withinMatrix(direction) && flag == 0) {
+            if (Utils.withinMatrix(direction)) {
                 Piece value = matrix[direction[0]][direction[1]];
-                if (value == null) {
+
                     arr.add(direction.clone());
                     direction[0] += step[0];
                     direction[1] += step[1];
-                } else {
-                    if (Utils.matrixIn(matrix, direction).color.equals(this.color)) {
+                    if (value != null)
                         break;
-                    }
-                    arr.add(direction.clone());
-                    direction[0] += step[0];
-                    direction[1] += step[1];
-                    flag += 1;
                 }
             }
-        }
     }
+
 
     public abstract ArrayList<int[]> getPseudoMoves(Piece[][] matrix);
 
@@ -72,8 +66,18 @@ public abstract class Piece {
         ArrayList<int[]> pseudo_moves = getPseudoMoves(matrix);
         Piece value;
 
+        ArrayList<int[]> moves = new ArrayList<>();
+        for (int[] move : pseudo_moves){
+            if (Utils.withinMatrix(move)) {
+                if (Utils.matrixIn(matrix, move) != null && Utils.matrixIn(matrix, move).color == this.color)
+                    continue;
+                moves.add(move);
+            }
+
+        }
+
         legalMoves.clear();
-        legalMoves = pseudo_moves;
+        legalMoves = moves;
 
     }
 
@@ -106,7 +110,20 @@ public abstract class Piece {
     }
 
 
+    public static Piece getPiece(char letter, PieceColor color)
+    {
+        return switch (letter) {
+            case 'K' -> new King(color);
+            case 'N' -> new Knight(color);
+            case 'B' -> new Bishop(color);
+            case 'Q' -> new Queen(color);
+            case 'R' -> new Rook(color);
 
+            default -> new Pawn(color);
+        };
+
+
+    }
 
 
 

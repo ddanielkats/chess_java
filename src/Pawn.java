@@ -1,9 +1,11 @@
 import java.util.ArrayList;
 
 public class Pawn extends Piece {
-
+    int up_direction;
     public Pawn(PieceColor color) {
         super("pawn", color, 1);
+        up_direction = color == PieceColor.WHITE ? -1 : 1;
+
     }
 
     public ArrayList<int[]> getPseudoMoves(Piece[][] matrix) {
@@ -11,7 +13,6 @@ public class Pawn extends Piece {
 
         int row = this.pos[0];
         int col = this.pos[1];
-        int up_direction = color == PieceColor.WHITE ? -1 : 1;
 
         int [] up_one = new int[] {row + up_direction, col};
         int [] up_two = new int[] {row + 2*up_direction, col};
